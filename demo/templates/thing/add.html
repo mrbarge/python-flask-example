@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block app_content %}
+
+    <div id="add" class="row">
+        <div id="addform" class="column">
+            <form action="" method="post" novalidate class="form-inline">
+                {{ form.hidden_tag() }}
+                <p>
+                <div class="form-group mx-sm-3 mb-2">
+                    {{ form.thing.label }}<br>
+                    {{ form.thing(size=60, class='form-control', placeholder='Enter a thing') }}
+                    {% for error in form.thing.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                </p>
+                <p>
+                <div class="form-group mx-sm-3 mb-2">
+                    {{ form.rating.label }}<br>
+                    {{ form.rating(size=5, class='form-control') }}
+                    {% for error in form.thing.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                </p>
+                <p>{{ form.submit(class='btn btn-primary mb-2') }}</p>
+            </form>
+        </div>
+    </div>
+{% endblock %}
