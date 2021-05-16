@@ -7,7 +7,7 @@ from flask_bootstrap import Bootstrap
 from flask_table import Table, Col
 
 # add DB
-db = SQLAlchemy()
+db = SQLAlchemy(engine_options={"pool_pre_ping": True})
 migrate = Migrate()
 metrics = None
 
