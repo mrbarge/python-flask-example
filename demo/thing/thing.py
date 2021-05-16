@@ -5,7 +5,7 @@ from sqlalchemy.pool import Pool
 from demo.models import db, Thing
 from demo.thing.tables import ThingResults
 from demo.thing.forms import ThingForm
-from flask import Blueprint, render_template, request, url_for, redirect, flash
+from flask import Blueprint, render_template, request, url_for, redirect, flash, abort, jsonify
 import traceback
 
 thing_bp = Blueprint('thing_bp', __name__)
@@ -14,7 +14,7 @@ thing_bp = Blueprint('thing_bp', __name__)
 @thing_bp.route('/')
 def list():
     try:
-        things_cur = Thing.query.filter().all()
+        things_cur = Thing.query.all()
     except sqlalchemy.exc.SQLAlchemyError:
         db.session.rollback()
         print(traceback.format_exc())
@@ -39,8 +39,8 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
     cursor.close()
 
 
-@thing_bp.route('/add', methods=['GET', 'POST'])
-def add():
+@thing_bp.route('/form-add', methods=['GET', 'POST'])
+def form_add():
     thing_form = ThingForm()
 
     if request.method == 'POST':
@@ -58,3 +58,31 @@ def add():
                 flash(f'An error occurred whilst searching: {err}', 'error')
 
     return render_template('thing/add.html', form=thing_form)
+
+
+@thing_bp.route('/json-add', methods=['POST'])
+def json_add():
+    if not request.json:
+        abort(400)
+    if not 'thing' in request.json or not 'rating' in request.json:
+        abort(400)
+
+    t = Thing(thing=request.json['thing'], rating=request.json['rating'])
+    try:
+        db.session.add(t)
+        db.session.commit()
+    except sqlalchemy.exc.SQLAlchemyError:
+        db.session.rollback()
+        return 'db error', 500
+    return jsonify(t)
+
+
+@thing_bp.route('/list', methods=['GET'])
+def json_list():
+    try:
+        things_cur = Thing.query.all()
+        return jsonify(things_cur)
+    except sqlalchemy.exc.SQLAlchemyError:
+        db.session.rollback()
+        print(traceback.format_exc())
+        return 'db unavailable', 500

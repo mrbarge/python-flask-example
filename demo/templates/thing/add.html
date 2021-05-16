@@ -4,7 +4,7 @@
 
     <div id="add" class="row">
         <div id="addform" class="column">
-            <form action="" method="post" novalidate class="form-inline">
+            <form action="{{ url_for('thing_bp.form_add') }}" method="post" novalidate class="form-inline">
                 {{ form.hidden_tag() }}
                 <p>
                 <div class="form-group mx-sm-3 mb-2">
